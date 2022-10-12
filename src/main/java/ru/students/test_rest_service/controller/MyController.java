@@ -10,17 +10,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.students.test_rest_service.model.Request;
 import ru.students.test_rest_service.model.Response;
+import ru.students.test_rest_service.service.ModifyRequestService;
 import ru.students.test_rest_service.service.MyModifyService;
-
-@RestController
 @Slf4j
+@RestController
 public class MyController {
 
     private final MyModifyService myModifyService;
+    private final ModifyRequestService modifyRequestService;
 
     @Autowired
-    public MyController(@Qualifier("ModifyErrorMessage") MyModifyService myModifyService) {
+    public MyController(@Qualifier("ModifySystemTime") MyModifyService myModifyService, ModifyRequestService modifyRequestService) {
         this.myModifyService = myModifyService;
+        this.modifyRequestService = modifyRequestService;
     }
 
     @PostMapping(value = "/feedback")
@@ -36,9 +38,11 @@ public class MyController {
                 .errorMessage("")
                 .build();
 
+        modifyRequestService.modifyRq(request);
+
         Response responseAfterModify = myModifyService.modify(response);
 
-        log.info("Response sent: " + response.toString());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        log.info("Response sent: " + responseAfterModify.toString());
+        return new ResponseEntity<>(responseAfterModify, HttpStatus.OK);
     }
 }
